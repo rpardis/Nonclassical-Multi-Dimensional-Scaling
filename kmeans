@@ -5,7 +5,7 @@
 % September 4, 2022
 %% 
 close all, clear all, clc
-N=3;pp=56;prak=.3;
+N=3;pp=156;prak=.8;
 
 U=Noqat_Awwali(N,pp,prak);
 xx=U(:,1);yy=U(:,2);
@@ -29,13 +29,13 @@ figure(4)
 subplot(1,2,1)
 colormap(pink(5))
 imagesc(vv)
-title('Before  Multi-Dimensional Scaling')
+title('Raw Dissimilarity Matrix')
 % colorbar
 
 subplot(1,2,2)
 r_ha=4;neq=([ 0 0.8 0.1]'*(0:r_ha))'./r_ha;colormap(neq)
 imagesc(mortb)
-title('Afterward')
+title('Multi-Dimensional Scaling application')
 
 
 %% ----------------------------------------------------------------------f1
@@ -83,10 +83,10 @@ while hadd
     [Taqir,xvv,yvv,dastebandi]=kimisz(xp,yp,xw,yw);
     pause(1/itt)
     xp=xvv;yp=yvv;
-    hadd=(Taqir>.0001)&&(itt<100);
+    hadd=(Taqir>1e-6)&&(itt<2e2);
 end
 % disp('Belongness Vector'),disp(dastebandi)
-ss1=sprintf('Taqir dar epoch = %g,   # Iteration = %G',Taqir,itt);
+ss1=sprintf('Changes at the last epoch = %g,   # Iteration = %G',Taqir,itt);
 title(ss1)
 end
 %% ----------------------------------------------------------------------f3
