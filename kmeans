@@ -1,0 +1,156 @@
+%% An examplar execution of k_means similarity matrix clustering
+% by means of Nonclassical Multi-Dimensional Scaling
+% Reza Paradise
+% Stand alone Matlab code
+% September 4, 2022
+%% 
+close all, clear all, clc
+N=3;pp=56;prak=.3;
+
+U=Noqat_Awwali(N,pp,prak);
+xx=U(:,1);yy=U(:,2);
+D = pdist(U);
+mm=D.*D;
+Z = squareform(D);
+[Y,ee] = mdscale(Z,2);
+
+xx0=Y(:,1);yy0=Y(:,2);
+
+figure(4);hold on
+xw=xx0;yw=yy0;
+plot(xx0,yy0,'c*')
+plot(0,0,'o', 'MarkerSize',22,'MarkerFaceColor','r')
+dastebandi=K_Meanser_T(xw,yw);
+% ===========================
+vv=Z;
+dd=dastebandi;
+mortb=booj(vv,dd);
+figure(4)
+subplot(1,2,1)
+colormap(pink(5))
+imagesc(vv)
+title('Before  Multi-Dimensional Scaling')
+% colorbar
+
+subplot(1,2,2)
+r_ha=4;neq=([ 0 0.8 0.1]'*(0:r_ha))'./r_ha;colormap(neq)
+imagesc(mortb)
+title('Afterward')
+
+
+%% ----------------------------------------------------------------------f1
+function ww=Noqat_Awwali(N,pp,prak)
+% N= Noqate marja ruye dayreh wahed
+% pp= Noqate atrafe noqat marja
+% prak= Parakandegi Noqat
+xx=zeros(1,N);yy=zeros(1,N);
+for ii=1:N
+    alfa=2*pi/N*ii;
+    xx(ii)=0.5+cos(alfa);
+    yy(ii)=0.5+sin(alfa);
+end
+xw=zeros(1,N*pp);yw=zeros(1,N*pp);
+for ii=1:N
+    ssx=randn(1,pp);
+    ssy=randn(1,pp);
+    sta=pp*(ii-1)+1;
+    qtar=sta:sta+pp-1;
+    xw(qtar)=prak*ssx+xx(ii);
+    yw(qtar)=prak*ssy+yy(ii);
+end
+ss=zeros(length(xw),2);
+ss(:,1)=xw;ss(:,2)=yw;
+ww=jaja(ss);
+end
+function bb=jaja(aa)
+[pig,~]=size(aa);
+h=randperm(pig,pig);
+
+bb=zeros(pig,2);
+for jj=1:pig
+    bb(jj,:)=aa(h(jj),:);
+end
+end
+%% ----------------------------------------------------------------------f2
+function dastebandi=K_Meanser_T(xw,yw)
+Number_of_Clusters=3;
+yboz=sqrt(max(max(xw))^2+(max(max(xw))^2));
+xp=(rand(1,Number_of_Clusters)-.5)*yboz;yp=(rand(1,Number_of_Clusters)-.5)*yboz;
+itt=0;
+hadd=1;
+while hadd
+    itt=itt+1;
+    [Taqir,xvv,yvv,dastebandi]=kimisz(xp,yp,xw,yw);
+    pause(1/itt)
+    xp=xvv;yp=yvv;
+    hadd=(Taqir>.0001)&&(itt<100);
+end
+% disp('Belongness Vector'),disp(dastebandi)
+ss1=sprintf('Taqir dar epoch = %g,   # Iteration = %G',Taqir,itt);
+title(ss1)
+end
+%% ----------------------------------------------------------------------f3
+function [E,xvv,yvv,ee]=kimisz(xp,yp,xw,yw)
+clf
+lw=length(xw);ee=zeros(1,lw);
+for kk=1:lw
+    fax=xp-xw(kk);fay=yp-yw(kk);
+    fa3=sqrt(fax.*fax+fay.*fay);
+    [~,id]=sort(fa3);
+    ee(kk)=id(1);
+end
+% disp(ee)
+xvv=xp;yvv=yp;
+rang2=rand(1,3);
+for hh=1:length(xp)
+    ii=0;
+    xh=zeros(1,1);yh=zeros(1,1);
+    for cc=1:lw
+        if ee(cc)==hh
+            ii=ii+1;
+            xh(ii)=xw(cc);yh(ii)=yw(cc);
+        end
+    end
+    if ii==0
+        xh=[];yh=[];
+    end
+
+
+    lh=length(xh);
+    xxx=ones(1,lh*2)*xp(hh);yyy=ones(1,lh*2)*yp(hh);
+    for gg=2:2:lh*2
+        xxx(gg)=xh(gg/2);yyy(gg)=yh(gg/2);
+    end
+    figure(1)
+    hold on
+    rang=mod(rang2+hh/length(xp),1);    
+    plot(xxx,yyy,'Color',rang)
+%     plot(xh,yh,'*','MarkerEdgeColor',rang,'MarkerSize',11)
+    plot(xp(hh),yp(hh),'yp','MarkerFaceColor',rang,'MarkerSize',17)
+    xvv(hh)=mean(xh);yvv(hh)=mean(yh);
+    if ii==0
+        xvv(hh)=rand(1,1);yvv(hh)=rand(1,1);
+    end
+end
+E=sum(sqrt((xvv-xp).^2+(yvv-yp).^2));
+end
+%% ----------------------------------------------------------------------f4
+function ww=booj(vv,h)
+lh=length(h);
+hh=h.*0;
+ii=0;
+ww=vv.*0;
+for jj=1:lh
+    for uu=1:lh
+        if h(uu)==jj
+            ii=ii+1;
+            hh(ii)=uu;
+        end
+    end
+end
+for jj=1:lh
+    for uu=1:lh
+        ww(uu,jj)=vv(hh(uu),hh(jj));
+    end
+end
+end
