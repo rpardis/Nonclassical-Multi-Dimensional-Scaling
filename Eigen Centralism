@@ -1,0 +1,54 @@
+% Plotting some centrality measures
+% Reza Paradise
+% 2022-Sept-15
+clc,clear all, close all
+%% INPUTS
+N=8;% #Nodes
+sparsity=.4;
+%% Calcs
+M0 = sprand(N,N,sparsity);
+hh=1-eye(N);
+M1 = ((M0 + M0').*hh+1-1);
+mmax=max(max(M1));
+A=floor(M1.*(9./mmax));
+disp('A=')
+disp(A)
+
+G1 = graph(A);
+ww=G1.Edges.Weight;
+
+degree_ranks_u = centrality(G1,'degree');%,'Importance',G1.Edges.Weight);
+degree_ranks_d = centrality(G1,'degree','Importance',G1.Edges.Weight);
+Gadad=(1:N)';tt=table(Gadad,degree_ranks_u,degree_ranks_d)
+G1.Nodes;
+
+figure(4)
+popo=plot(G1,'h','EdgeLabel',ww,'EdgeLabel',ww,'LineWidth',ww,'MarkerSize',12);
+popo.NodeCData = degree_ranks_d;
+colormap jet
+colorbar
+title('Degree importance measures of nodes')
+%% 'eigenvector'
+eig_0= centrality(G1,'eigenvector');
+eig_I= centrality(G1,'eigenvector','Importance',G1.Edges.Weight);
+Gadad=(1:N)';
+Rotbeh=(rotbe(eig_I))';
+tt2=table(Gadad,eig_I,Rotbeh)
+
+figure(5)
+peig=plot(G1,'p','EdgeLabel',ww,'EdgeLabel',ww,'LineWidth',ww,'MarkerSize',12);
+peig.NodeCData = eig_I;
+colormap jet
+colorbar
+title('Eigen values of nodes')
+
+
+function ee=rotbe(R)
+[S,~]=sort(R);
+lr=length(R)
+ee=zeros(1,lr);
+for ii=1:lr
+    ee(1,ii)=find(S==R(ii));
+end
+ee=lr-ee+1;
+end
